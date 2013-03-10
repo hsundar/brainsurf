@@ -6,19 +6,19 @@ This project uses OpenCV primarily through its python interface. It shall be por
 
 The repository tree should look like this,
 
-brainsurf/
-|_____ README.md
-|
-|_____ Python/
-|         |______ calibrate.py
-|         |______ pose_estimate.py
-|         |______ reconstruct.py 
-|
-|_____ C++/
-|_____ Data/
-|         |______ calibration_target.pdf
-|
-|_____ Tests/
+    brainsurf/
+    |_____ README.md
+    |
+    |_____ Python/
+    |         |______ calibrate.py
+    |         |______ pose_estimate.py
+    |         |______ reconstruct.py 
+    |
+    |_____ C++/
+    |_____ Data/
+    |         |______ calibration_target.pdf
+    |
+    |_____ Tests/
 
 ## Components
 
