@@ -1,60 +1,48 @@
-'''This script will take a set of images, along with parameters \
-specifying the dimensions of the calibration target (checkerboard \
-pattern) and estimate the intrinsic camera parameters. The script \
-will also perform validation using back-projection and provide an \
-estimate of the quality of the calibration. \n \n \
-Should be called in command line as: \n python \
-<path_to_calibrate.py> <list_of_images> <points_per_row> \
-<points_per_col>'''
+import cv, sys, time
+# Variables
+#src_img = sys.argv[]
+#n_row = int( sys.argv[] )
+#n_col = int( sys.argv[] )
+    
+# Temp. variables
+src_img = '/home/wtrdrnkr/Documents/brainsurf/Data/calibration_target.jpg' # Input image of chessboard
+dst_img = '/home/wtrdrnkr/Documents/brainsurf/Data/drawCorners.jpg' # Location to render image of found corners
+n_row = 8
+n_col = 6
+patternSize = ( n_row, n_col )
 
-import cv
-import sys
+def main():
+    '''Determines intrinsic and extrinsic parameters of camera based on images \
+    passed to calibrate.py'''
+    corners()
+    
+def corners():
+    '''Finds corners and renders them in dst_img'''
+    
+    # Load/convert image
+    sys.stdout.write('Loading image as grayscale......')
+    image_in = cv.LoadImage( src_img, iscolor=0 ); print('DONE') # matrix
 
-image = cv.LoadImage('/home/michaelm/Documents/brainsurf/IMG_0364.jpg') #!!
-pts_in_row = 9 #!!
-pts_in_column = 6 #!!
-patternSize = (pts_in_row, pts_in_column)
+    # Find corners
+    sys.stdout.write('Finding corners......')
+    retval, corners = cv.FindChessboardCorners( image_in, patternSize )
+    if retval != 1:
+        print('CORNERS NOT FOUND')
+        print('END')
+        quit()
+    else:
+        print('DONE');
 
-# Find corners
-retval, corners = cv.FindChessboardCorners(image, patternSize)
+    # Render corners
+    sys.stdout.write('Rendering found corners......'),
+    image_out = cv.CreateMat(1100, 850, 0) # Height/width of image (px)
+    cv.DrawChessboardCorners( image_out, patternSize, corners, retval ); print('DONE')
+    
+    sys.stdout.write('Saving file......'),
+    cv.SaveImage(dst_img, image_out); print('DONE'); print('    Location: %s')%dst_img
 
-
-#========================== vv Being Developed vv ===========================
-# Draw corners
-cv.DrawChessboardCorners(image, patternSize, corners, retval)
-
-
-
-
-
-
-
-
-
+main()
 
 
-#===================== vv For command line functionality vv ====================
-### sys.argv is a list of the command-line arguments
-##    
-### Build list of images to be processed
-##imgList = open( str(sys.argv[1]),'r' ) # file object for the imageList
-##images = buildImageList( imageList ) # list of images as strings
-##imgList.close()
-##
-###get patternSize
-##points_per_row = sys.argv[2]
-##points_per_col = sys.argv[3]
-##patternSize = cv.cvSize(points_per_row, points_per_column)
-##
-##
-####    retval, corners = cv.findChessboardCorners(image, patternSize)
-##
-##def buildImageList( imageList ):
-##    '''Returns a list strings that are the paths to the images to be processed.'''
-##    images = []
-##
-##    for line in imageList:
-##        images.append( str(line) )
-##
-##    return images
-        
+#InitIntrinsicParams2D(objectPoints, imagePoints, npoints, imageSize, cameraMatrix, aspectRatio=1.)
+#CalibrateCamera2(objectPoints, imagePoints, pointCounts, imageSize, cameraMatrix, distCoeffs, rvecs, tvecs, flags=0)
