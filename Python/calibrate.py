@@ -18,28 +18,27 @@ def main():
     
 def corners():
     '''Finds corners and renders them in dst_img'''
-    
     # Load/convert image
     sys.stdout.write('Loading image as grayscale......')
-    image_in = cv.LoadImage( src_img, iscolor=0 ); print('DONE') # matrix
-
+    img_in = cv.LoadImageM( src_img, iscolor=0 ); print('DONE')
+    
     # Find corners
     sys.stdout.write('Finding corners......')
-    retval, corners = cv.FindChessboardCorners( image_in, patternSize )
+    retval, corners = cv.FindChessboardCorners( img_in, patternSize )
     if retval != 1:
-        print('CORNERS NOT FOUND')
-        print('END')
-        quit()
+        print('CORNERS NOT FOUND');print('END');quit()
     else:
-        print('DONE');
+        # Refine corners: !!!!check parameters!!!! ===
+        corners = cv.FindCornerSubPix(img_in, corners, (5,5), (-1,-1), (cv.CV_TERMCRIT_EPS,0,.01)); print('DONE')
 
-    # Render corners
-    sys.stdout.write('Rendering found corners......'),
-    image_out = cv.CreateMat(1100, 850, 0) # Height/width of image (px)
-    cv.DrawChessboardCorners( image_out, patternSize, corners, retval ); print('DONE')
+    # Render corners in matrix
+    sys.stdout.write('Rendering found corners......')
+    img_out = cv.CreateMat(1100, 850, 0)
+    cv.DrawChessboardCorners( img_out, patternSize, corners, retval ); print('DONE')
     
-    sys.stdout.write('Saving file......'),
-    cv.SaveImage(dst_img, image_out); print('DONE'); print('    Location: %s')%dst_img
+    # Save rendered corners
+    sys.stdout.write('Saving file......')
+    cv.SaveImage(dst_img, img_out); print('DONE'); print('    Location: %s')%dst_img
 
 main()
 
