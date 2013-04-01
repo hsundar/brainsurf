@@ -1,15 +1,19 @@
-import cv, sys, time
+# Currently working on:
+#    - Multiple images
+
+
+import cv, sys, os
 # Variables
 #src_img = sys.argv[]
 #n_row = int( sys.argv[] )
 #n_col = int( sys.argv[] )
     
 # Temp. variables
-n_img = 1
-src_img = '/home/wtrdrnkr/Documents/brainsurf/Data/calibration_target.jpg' # Input image of chessboard
+path_to_images = '/home/wtrdrnkr/Pictures/Calib_images/'
+#src_img = '/home/wtrdrnkr/Documents/brainsurf/Data/calibration_target.jpg' # Input image of chessboard
 dims = (850, 1100)
 n_pts = dims[0]*dims[1] #=== number of points?
-dst_img = '/home/wtrdrnkr/Documents/brainsurf/Data/drawCorners.jpg' # Location to render image of found corners
+#dst_img = '/home/wtrdrnkr/Documents/brainsurf/Data/drawCorners.jpg' # Location to render image of found corners
 n_row = 8
 n_col = 6
 patternSize = ( n_row, n_col )
@@ -17,14 +21,18 @@ patternSize = ( n_row, n_col )
 def main():
     '''Determines intrinsic and extrinsic parameters of camera based on images \
     passed to calibrate.py'''
-    c = corners()
-    calibrate(c)
+    ptList = []
+    count = 0
+    for src_img in os.listdir(path_to_images):
+        ptList.append(corners(src_img))
+    print(ptList)
+    #calibrate(c)
     
-def corners():
+def corners(src_img):
     '''Finds corners and renders them in dst_img'''
     # Load/convert image
-    sys.stdout.write('Loading image as grayscale......')
-    img_in = cv.LoadImageM( src_img, iscolor=0 ); print('DONE')
+    sys.stdout.write('Loading %s as grayscale......')%str(src_img)
+    img_in = cv.LoadImageM( path_to_images+src_img, iscolor=0 ); print('DONE')
     
     # Find corners
     sys.stdout.write('Finding corners......')
@@ -47,6 +55,7 @@ def corners():
     # Save rendered corners
     sys.stdout.write('Saving file......')
     cv.SaveImage(dst_img, img_out); print('DONE'); print('    Location: %s')%dst_img
+
     return corners
 
 def calibrate(corners):
