@@ -1,5 +1,5 @@
 # Currently working on:
-#    - Multiple images
+#    - Auto recognize dimensions of input img
 
 
 import cv, sys, os
@@ -9,30 +9,31 @@ import cv, sys, os
 #n_col = int( sys.argv[] )
     
 # Temp. variables
-path_to_images = '/home/wtrdrnkr/Pictures/Calib_images/'
-#src_img = '/home/wtrdrnkr/Documents/brainsurf/Data/calibration_target.jpg' # Input image of chessboard
-dims = (850, 1100)
-n_pts = dims[0]*dims[1] #=== number of points?
-#dst_img = '/home/wtrdrnkr/Documents/brainsurf/Data/drawCorners.jpg' # Location to render image of found corners
-n_row = 8
+path_to_imgs = '/home/wtrdrnkr/Pictures/Calib_images/' # Retrieve from and save to
+dims = (3744, 2104) # Dimensions of input img
+n_pts = dims[0]*dims[1] #=== number of points=pixels?
+n_row = 9
 n_col = 6
 patternSize = ( n_row, n_col )
 
 def main():
     '''Determines intrinsic and extrinsic parameters of camera based on images \
     passed to calibrate.py'''
-    ptList = []
-    count = 0
-    for src_img in os.listdir(path_to_images):
-        ptList.append(corners(src_img))
-    print(ptList)
+    cornerList = []
+    # Add corners from each img into ptList
+    # Each set of corners is its own element
+    for src_img in os.listdir(path_to_imgs):
+        if 'crn' not in src_img:
+            cornerList.append(corners(src_img))
+    print(cornerList)
     #calibrate(c)
     
 def corners(src_img):
     '''Finds corners and renders them in dst_img'''
     # Load/convert image
-    sys.stdout.write('Loading %s as grayscale......')%str(src_img)
-    img_in = cv.LoadImageM( path_to_images+src_img, iscolor=0 ); print('DONE')
+    print('Loading %s as grayscale......')%src_img,
+    path = path_to_imgs+src_img
+    img_in = cv.LoadImageM( path, iscolor=0 ); print('DONE')
     
     # Find corners
     sys.stdout.write('Finding corners......')
@@ -54,7 +55,8 @@ def corners(src_img):
     
     # Save rendered corners
     sys.stdout.write('Saving file......')
-    cv.SaveImage(dst_img, img_out); print('DONE'); print('    Location: %s')%dst_img
+    dst_img = path_to_imgs+'crn'+src_img
+    cv.SaveImage(dst_img, img_out); print('DONE'); print('    Location: %s\n')%dst_img
 
     return corners
 
