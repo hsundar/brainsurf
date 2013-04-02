@@ -1,6 +1,6 @@
 # Currently working on:
-#    - Auto recognize dimensions of input img
-
+#    - Auto recognize dimensions of input imgs
+#    - calibrate() function
 
 import cv, sys, os
 # Variables
@@ -23,7 +23,7 @@ def main():
     # Add corners from each img into ptList
     # Each set of corners is its own element
     for src_img in os.listdir(path_to_imgs):
-        if 'crn' not in src_img:
+        if 'crn' not in src_img: # prevents corner()ing of rendered corners
             cornerList.append(corners(src_img))
     print(cornerList)
     #calibrate(c)
@@ -36,7 +36,7 @@ def corners(src_img):
     img_in = cv.LoadImageM( path, iscolor=0 ); print('DONE')
     
     # Find corners
-    sys.stdout.write('Finding corners......')
+    print('Finding corners......'),
     retval, corners = cv.FindChessboardCorners( img_in, patternSize )
     if retval != 1:
         print('CORNERS NOT FOUND');print('END');quit()
@@ -45,16 +45,16 @@ def corners(src_img):
         corners = cv.FindCornerSubPix(img_in, corners, (5,5), (-1,-1), (cv.CV_TERMCRIT_EPS,0,.01)); print('DONE')
 
     # Render corners in matrix
-    sys.stdout.write('Rendering found corners......')
+    print('Rendering found corners......'),
     img_out = cv.CreateMat(dims[1], dims[0], 0)
     cv.DrawChessboardCorners( img_out, patternSize, corners, retval ); print('DONE')
     
-    # Show preview image of rendered corners
-    cv.ShowImage('Out', img_out)
-    cv.WaitKey(2500)
+#     # Show preview image of rendered corners
+#     cv.ShowImage('Out', img_out)
+#     cv.WaitKey(2500)
     
     # Save rendered corners
-    sys.stdout.write('Saving file......')
+    print('Saving file......'),
     dst_img = path_to_imgs+'crn'+src_img
     cv.SaveImage(dst_img, img_out); print('DONE'); print('    Location: %s\n')%dst_img
 
