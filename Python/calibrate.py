@@ -1,19 +1,30 @@
+# calibrate.py determines intrinsic/extrinsic attributes of a camera from input images
+#
+# Usage: python calibrate.py n_row n_col path_to_imgs
+#
+# Last modified: 4/1/2013
+#
 # Currently working on:
-#    - Auto recognize dimensions of input imgs
 #    - calibrate() function
+#    - Auto recognize dimensions of input imgs
+#    - Auto recognize patternSize
 
 import cv, sys, os
-# Variables
-#src_img = sys.argv[]
-#n_row = int( sys.argv[] )
-#n_col = int( sys.argv[] )
-    
-# Temp. variables
-path_to_imgs = '/home/wtrdrnkr/Pictures/Calib_images/' # Retrieve from and save to
+# Global Variables
+if len(sys.argv) > 1:
+    # If from command line
+    n_row = int( sys.argv[1] )
+    n_col = int( sys.argv[2] )
+    path_to_imgs = str( sys.argv[3] )
+
+else:
+    # Temp. variables (for development)
+    path_to_imgs = '/home/wtrdrnkr/Pictures/Calib_images/' # Retrieves from and saves to
+    n_row = 9
+    n_col = 6
+
 dims = (3744, 2104) # Dimensions of input img
 n_pts = dims[0]*dims[1] #=== number of points=pixels?
-n_row = 9
-n_col = 6
 patternSize = ( n_row, n_col )
 
 def main():
@@ -38,8 +49,7 @@ def corners(src_img):
     # Find corners
     print('Finding corners......'),
     retval, corners = cv.FindChessboardCorners( img_in, patternSize )
-    if retval != 1:
-        print('CORNERS NOT FOUND');print('END');quit()
+    if retval != 1:print('CORNERS NOT FOUND');print('END');quit()
     else:
         # Refine corners: !!!!check parameters!!!! ===
         corners = cv.FindCornerSubPix(img_in, corners, (5,5), (-1,-1), (cv.CV_TERMCRIT_EPS,0,.01)); print('DONE')
