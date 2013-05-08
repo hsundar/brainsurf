@@ -1,5 +1,5 @@
 import cv, sys, os
-g_switch_value = 0;
+cur_pos = 0;
 colorInt = 0;
 
 # Trackbar/switch callback
@@ -10,28 +10,33 @@ def switch_callback( position ):
          colorInt = 1
 
 def main():
-    name = "Demo Window"
+    name = 'evalFeats'
+    
+    # Point attributes
     radius = 30
     thickness = 2
     connectivity = 8
     green = cv.CV_RGB(0,250,0)
-    orange = cv.CV_RGB(250,150,0)
-
+    
+    
     src1 = cv.LoadImage( '/home/wtrdrnkr/Documents/ecog/grids.jpg' )
-    pt2 = (100,100)
+    
 
     cv.NamedWindow( name, 1 )
 
-    cv.CreateTrackbar( "Switch", name, g_switch_value, 1, switch_callback )
-
-
+    cv.CreateTrackbar( "Threshold", name, cur_pos, 255, switch_callback )
+    
     while True:
+        pt2 = (cv.GetTrackbarPos('Threshold', name),cv.GetTrackbarPos('Threshold', name))
         if colorInt == 0:
             cv.Circle(src1,pt2,radius,green,thickness,connectivity)
         else:
-            cv.Circle(src1,pt2,radius,orange,thickness,connectivity)
+            cv.Circle(src1,pt2,radius,green,thickness,connectivity)
         cv.ShowImage(name, src1)
-        if cv.WaitKey( 15 ) == 27: 
+        
+        # Time before change is applied (ms)
+        waittime = 15
+        if cv.WaitKey( waittime ) == 27: # ESC
             break
     
     cv.DestroyWindow( name )
