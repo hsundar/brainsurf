@@ -3,11 +3,10 @@ import cv, sys, os
 # == Cant find feature detection algorithms (python)
 # == How to get rid of previous detected pts as trackbar moves
 
-image = cv.LoadImage('/home/michaelm/Documents/ecog/grids.jpg')
+image = cv.LoadImageM('/home/michaelm/Documents/ecog/grids.jpg')
 cur_pos = 0
 def main(image):
     name = 'evalFeats'
-    
     # Point attributes
     radius = 30
     thickness = 2
@@ -17,11 +16,11 @@ def main(image):
     # Create window & trackbar
     cv.NamedWindow(name, 1)
     cv.CreateTrackbar('Threshold', name, cur_pos, 255, switch_callback)
-    
+
     while True:
         # Detected points
-        pt0 = (cv.GetTrackbarPos('Threshold', name),cv.GetTrackbarPos('Threshold', name))
-        pts = [pt0] #list of points returned from feature detection
+        testpt = (cv.GetTrackbarPos('Threshold', name),cv.GetTrackbarPos('Threshold', name))
+        pts = [testpt] #list of points returned from feature detection
         for pt in pts:
             cv.Circle(image,pt,radius,green,thickness,connectivity)
         
@@ -36,9 +35,33 @@ def main(image):
 def switch_callback( position ):
     cur_pos = position
 
-main(image)
-
-
+#main(image)
+def test(image):
+    img = cv.LoadImageM('/home/michaelm/Documents/ecog/grids.jpg', cv.CV_LOAD_IMAGE_GRAYSCALE)
+    eig_image = cv.CreateMat(img.rows, img.cols, cv.CV_32FC1)
+    temp_image = cv.CreateMat(img.rows, img.cols, cv.CV_32FC1)
+    
+    # Point attributes
+    radius = 30
+    thickness = 2
+    connectivity = 8
+    green = cv.CV_RGB(0,250,0)
+    
+    pts = []
+    alg = cv.GoodFeaturesToTrack(img, eig_image, temp_image, cur_pos, 0.04, 1.0, useHarris=True)
+    for (x,y) in alg:
+        pts.append((x,y))
+    cv.NamedWindow('test')
+    cv.CreateTrackbar('Threshold', name, cur_pos, 255, switch_callback)
+    
+    while True:
+        for pt in pts:
+            cv.Circle(img, (int(pt[0]),int(pt[1])), radius, green, thickness, connectivity )
+        cv.ShowImage('test', img)
+        if cv.WaitKey(15) == 27:
+            break
+    cv.DestroyWindow('test')    
+test(image)
 
 # def switch_callback(pos):
 #     position = pos
