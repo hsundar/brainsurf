@@ -1,17 +1,11 @@
 import cv, sys, os
 # Problems:
-# == Cant find feature detection algorithms
+# == Cant find feature detection algorithms (python)
+# == How to get rid of previous detected pts as trackbar moves
 
-
-
-cur_pos = 0;
-colorInt = 0;
-
-# Trackbar/switch callback
-def switch_callback( position ):
-    return 'hi' #?
-
-def main2():
+image = cv.LoadImage('/home/michaelm/Documents/ecog/grids.jpg')
+cur_pos = 0
+def main(image):
     name = 'evalFeats'
     
     # Point attributes
@@ -20,23 +14,29 @@ def main2():
     connectivity = 8
     green = cv.CV_RGB(0,250,0)
     
-
-    src1 = cv.LoadImage('/home/michaelm/Documents/ecog/grids.jpg')
+    # Create window & trackbar
     cv.NamedWindow(name, 1)
-    cv.CreateTrackbar( "Threshold", name, cur_pos, 255, switch_callback )
+    cv.CreateTrackbar('Threshold', name, cur_pos, 255, switch_callback)
     
     while True:
-        pts = [(cv.GetTrackbarPos('Threshold', name),cv.GetTrackbarPos('Threshold', name))] #list of points returned from featdet
+        # Detected points
+        pt0 = (cv.GetTrackbarPos('Threshold', name),cv.GetTrackbarPos('Threshold', name))
+        pts = [pt0] #list of points returned from feature detection
         for pt in pts:
-            cv.Circle(src1,pt,radius,green,thickness,connectivity)
-        cv.ShowImage(name, src1)
-        if cv.WaitKey(15) == 27: # ESC
+            cv.Circle(image,pt,radius,green,thickness,connectivity)
+        
+        cv.ShowImage(name, image)
+
+        # Key to quit
+        if cv.WaitKey( 15 ) == 27: # ESC
             break
+    
     cv.DestroyWindow( name )
 
-    return 0
+def switch_callback( position ):
+    cur_pos = position
 
-main2()
+main(image)
 
 
 
