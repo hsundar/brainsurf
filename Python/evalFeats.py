@@ -1,12 +1,17 @@
 import cv, sys, os
+# Problems:
+# == Cant find feature detection algorithms
+
+
+
 cur_pos = 0;
 colorInt = 0;
 
 # Trackbar/switch callback
 def switch_callback( position ):
-    return 1 #?
+    return 'hi' #?
 
-def main():
+def main2():
     name = 'evalFeats'
     
     # Point attributes
@@ -15,29 +20,26 @@ def main():
     connectivity = 8
     green = cv.CV_RGB(0,250,0)
     
-    
-    src1 = cv.LoadImage('/home/wtrdrnkr/Documents/ecog/grids.jpg')
-    
 
+    src1 = cv.LoadImage('/home/michaelm/Documents/ecog/grids.jpg')
     cv.NamedWindow(name, 1)
-
     cv.CreateTrackbar( "Threshold", name, cur_pos, 255, switch_callback )
     
     while True:
-        pts = [] #list of points returned from featdet
+        pts = [(cv.GetTrackbarPos('Threshold', name),cv.GetTrackbarPos('Threshold', name))] #list of points returned from featdet
         for pt in pts:
             cv.Circle(src1,pt,radius,green,thickness,connectivity)
         cv.ShowImage(name, src1)
-        # Time before change is applied (ms)
-        waittime = 15
-        if cv.WaitKey( waittime ) == 27: # ESC
+        if cv.WaitKey(15) == 27: # ESC
             break
-    
     cv.DestroyWindow( name )
 
     return 0
 
-main()
+main2()
+
+
+
 # def switch_callback(pos):
 #     position = pos
 #     if position <= 255 and position >=0:
