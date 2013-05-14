@@ -13,10 +13,8 @@ import cv
 # WaitKey == 27 not working properly
 # Previous pts not going away
 
-
-
 img = '/home/wtrdrnkr/Documents/ecog/grids.jpg'
-image = cv.LoadImageM(img)
+image = cv.LoadImage(img)
 windowName = 'evalFeats.py'
 trackbarName = 'Adjust'
 strtPos = 0
@@ -27,26 +25,22 @@ thickness = 2
 connectivity = 8
 green = cv.CV_RGB(0,250,0)
 
-
 def main():
     cv.NamedWindow(windowName, cv.CV_WINDOW_AUTOSIZE)
-    cv.CreateTrackbar(trackbarName, windowName, strtPos, endPos, barPos)
+    cv.CreateTrackbar(trackbarName, windowName, strtPos, endPos, barPos)  
     while True:
-        showimg()
+        showimg(image)
+        if cv.WaitKey(10) == 27: #ESC to cancel?
+            break
 
-def showimg():
-    
-    while cv.WaitKey(10) != 27: # ESC
-        cv.ShowImage(windowName, image)
-        pts = [(x,y) for (x,y) in [(cv.GetTrackbarPos(trackbarName, windowName),cv.GetTrackbarPos(trackbarName, windowName))]]
-        for pt in pts:
-            cv.Circle(image,pt,radius,green,thickness,connectivity)  
-                   
+def showimg(image):
+    cv.ShowImage(windowName, image)
+    pts = [(x,y) for (x,y) in [(cv.GetTrackbarPos(trackbarName, windowName),cv.GetTrackbarPos(trackbarName, windowName))]]
+    for pt in pts:
+        cv.Circle(image,pt,radius,green,thickness,connectivity)    
 def barPos(x):
     strtPos = x
 
-    
-    
 main()    
 
 
