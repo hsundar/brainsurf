@@ -33,12 +33,15 @@ def main():
         showimg(image)
 
 def showimg(image):
-    cv.ShowImage(windowName, image)
-    pts = [(x,y) for (x,y) in [(cv.GetTrackbarPos(trackbarName, windowName),cv.GetTrackbarPos(trackbarName, windowName))]]
+    imCopy = image
+    pts = [(x,y) for (x,y) in [(cv.GetTrackbarPos(trackbarName, windowName), cv.GetTrackbarPos(trackbarName, windowName))]]
     for pt in pts:
-        cv.Circle(image,pt,radius,green,thickness,connectivity)    
+        cv.Circle(imCopy, pt,radius,green,thickness,connectivity)
+    cv.ShowImage(windowName, imCopy)    
+        
 def barPos(x):
     strtPos = x
+    
 main()    
 
 
