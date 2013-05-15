@@ -1,4 +1,6 @@
-import cv
+# opencv 2.4.3
+# Python 2.7
+import cv2 as cv
 # cv.ExtractSURF()
 # cv.GetStarKeypoints()
 # cv.Canny(image, edges, threshold1, threshold2)
@@ -14,7 +16,7 @@ import cv
 # Previous pts not going away
 
 img = '/home/michaelm/Documents/ecog/grids.jpg'
-image = cv.LoadImage(img)
+image = cv.imread(img)
 windowName = 'evalFeats.py'
 trackbarName = 'Adjust'
 strtPos = 0
@@ -22,26 +24,26 @@ endPos = 255
 
 # Circle properties
 radius = 30
+color = (0,0,255)
 thickness = 2
 connectivity = 8
-green = cv.CV_RGB(0,250,0)
 
 def main():
-    cv.NamedWindow(windowName, cv.CV_WINDOW_AUTOSIZE)
-    cv.CreateTrackbar(trackbarName, windowName, strtPos, endPos, barPos)
-    while cv.WaitKey(10) != 27:
+    cv.namedWindow(windowName, cv.CV_WINDOW_AUTOSIZE)
+    cv.createTrackbar(trackbarName, windowName, strtPos, endPos, barPos)
+    while cv.waitKey(10) != 27:
         showimg(image)
 
 def showimg(image):
     imCopy = image
-    pts = [(x,y) for (x,y) in [(cv.GetTrackbarPos(trackbarName, windowName), cv.GetTrackbarPos(trackbarName, windowName))]]
+    pts = [(x,y) for (x,y) in [(cv.getTrackbarPos(trackbarName, windowName), cv.getTrackbarPos(trackbarName, windowName))]]
     for pt in pts:
-        cv.Circle(imCopy, pt,radius,green,thickness,connectivity)
-    cv.ShowImage(windowName, imCopy)    
-        
+        cv.circle(imCopy, pt,radius,color,thickness,connectivity)
+    cv.imshow(windowName, imCopy) 
+      
 def barPos(x):
     strtPos = x
-    
+
 main()    
 
 
