@@ -1,6 +1,8 @@
-# opencv 2.4.3
+# opencv 2.4.5
 # Python 2.7
+import sys, os
 import cv2 as cv
+import numpy as np
 # cv.ExtractSURF()
 # cv.GetStarKeypoints()
 # cv.Canny(image, edges, threshold1, threshold2)
@@ -13,89 +15,49 @@ import cv2 as cv
 # cv.PreCornerDetect(image, corners)
 
 # WaitKey == 27 not working properly
-# Previous pts not going away
+# What values for threshold in various algorithms
 
-img = '/home/michaelm/Documents/ecog/grids.jpg'
+if len(sys.argv) > 1:
+    print('Command Line')
+    dir = os.getcwd()+'/'
+    img = str(sys.argv[1]) #== to be updated later
+    print('Current image: '+img)
+#     if sys.argv[2] == 0:
+#         alg = surf()
+#     elif sys.argv[2] == 1:
+#         alg = sift()
+
 image = cv.imread(img)
 windowName = 'evalFeats.py'
 trackbarName = 'Adjust'
-strtPos = 0
-endPos = 255
-
-# Circle properties
-radius = 30
-color = (0,0,255)
-thickness = 2
-connectivity = 8
+strtPos = 0 # Location of trackbar slider
+endPos = 10000
 
 def main():
     cv.namedWindow(windowName, cv.CV_WINDOW_AUTOSIZE)
     cv.createTrackbar(trackbarName, windowName, strtPos, endPos, barPos)
-    while cv.waitKey(10) != 27:
-        showimg(image)
-
-def showimg(image):
-    imCopy = image
-    pts = [(x,y) for (x,y) in [(cv.getTrackbarPos(trackbarName, windowName), cv.getTrackbarPos(trackbarName, windowName))]]
-    for pt in pts:
-        cv.circle(imCopy, pt,radius,color,thickness,connectivity)
-    cv.imshow(windowName, imCopy) 
-      
-def barPos(x):
-    strtPos = x
-
-main()    
-
-
-# def main(image):
-#     name = 'evalFeats'
-#     # Point attributes
-#     radius = 30
-#     thickness = 2
-#     connectivity = 8
-#     green = cv.CV_RGB(0,250,0)
-#     # Create window & trackbar
-#     cv.NamedWindow(name, 1)
-#     cv.CreateTrackbar('Threshold', name, cur_pos, 255, switch_callback)
-#     # Show pts
-#     while True:
-#         # Detected points
-#         testpt = (cv.GetTrackbarPos('Threshold', name),cv.GetTrackbarPos('Threshold', name))
-#         pts = [testpt] #list of points returned from feature detection
-#         for pt in pts:
-#             cv.Circle(image,pt,radius,green,thickness,connectivity)
-#         cv.ShowImage(name, image)
-#         # Key to quit
-#         if cv.WaitKey( 15 ) == 27: # ESC
-#             break
-#     cv.DestroyWindow( name )
-
-def switch_callback( position ):
-    cur_pos = position
-
-#main(image)
-def test(image):
-    img = cv.LoadImageM('/home/michaelm/Documents/ecog/grids.jpg', cv.CV_LOAD_IMAGE_GRAYSCALE)
-    eig_image = cv.CreateMat(img.rows, img.cols, cv.CV_32FC1)
-    temp_image = cv.CreateMat(img.rows, img.cols, cv.CV_32FC1)
-    
-    # Point attributes
-    radius = 30
-    thickness = 2
-    connectivity = 8
-    green = cv.CV_RGB(0,250,0)
-    
-    
-    alg = cv.GoodFeaturesToTrack(img, eig_image, temp_image, cur_pos, 0.04, 1.0, useHarris=True)
-    pts = [(x,y) for (x,y) in alg]
-    cv.NamedWindow('test')
-    #cv.CreateTrackbar('Threshold', name, cur_pos, 255, switch_callback)  
-    
     while True:
-        for pt in pts:
-            cv.Circle(img, (int(pt[0]),int(pt[1])), radius, green, thickness, connectivity )
-        cv.ShowImage('test', img)
-        if cv.WaitKey(15) == 27:
+        showimg(image)
+        if cv.waitKey(15) == 27: #ESC
+            print('END')
             break
-    cv.DestroyWindow('test')    
-#test(image)
+        elif cv.waitKey(15) == 110: #'n' for next image
+            nextimg = 'asdfasdf'
+#             image = cv.imread(nextimg)
+            print('NEXT IMAGE')
+            
+            
+        
+def showimg(image):
+    strtPos = cv.getTrackbarPos(trackbarName, windowName)
+    imCopy = image.copy() # Create copy of image to draw pts on
+    surf = cv.SURF(strtPos, nOctaves=4, nOctaveLayers=2, extended=True, upright=False)
+    pts = surf.detect(imCopy)
+    cv.drawKeypoints(imCopy, pts, imCopy, (0,0,255))
+    cv.imshow(windowName, imCopy)
+    
+def barPos(x): # Updates strtPos when trackbar slider moves
+    strtPos = x
+# def surf():
+#     return windowName, trackbarName, strtPos, endPos
+main()    
