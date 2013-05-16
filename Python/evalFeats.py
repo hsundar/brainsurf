@@ -3,16 +3,6 @@
 import sys, os
 import cv2 as cv
 import numpy as np
-# cv.ExtractSURF()
-# cv.GetStarKeypoints()
-# cv.Canny(image, edges, threshold1, threshold2)
-# cv.CornerHarris(image, harris_dst, blockSize)
-# cv.CornerMinEigenVal(image, eigenval, blockSize)
-# cv.CornerEigenValsAndVecs(image, eigenvv, blockSize)
-# cv.FindCornerSubPix(image, corners, win, zero_zone, criteria)
-# cv.GoodFeaturesToTrack(image, eigImage, tempImage, cornerCount, qualityLevel, minDistance)
-# cv.HoughLines2(image, storage, method, rho, theta, threshold)
-# cv.PreCornerDetect(image, corners)
 
 # WaitKey == 27 not working properly
 # What values for threshold in various algorithms
@@ -45,9 +35,7 @@ def main():
             nextimg = 'asdfasdf'
 #             image = cv.imread(nextimg)
             print('NEXT IMAGE')
-            
-            
-        
+
 def showimg(image):
     strtPos = cv.getTrackbarPos(trackbarName, windowName)
     imCopy = image.copy() # Create copy of image to draw pts on
