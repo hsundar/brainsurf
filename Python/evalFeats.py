@@ -16,7 +16,18 @@ curPos = 0 # Location of trackbar slider
 endPos = 10000 #===
 
 def main(image):
+    #image = getImg()
     createGUI(windowName, trackbarName, curPos, endPos)
+    #c = cv.waitKey() #need num?
+    #while c != 27:
+        #if c == 113: #n for next image
+            #image = getImg()
+        #if c == #p previous image
+        #if c == #right arrow? Next alg
+            #mode += 1
+        #if c == #left arrow? Next alg
+            #mode -= 1
+        #showimg(image, mode)
     while cv.waitKey(15) != 27: #ESC
         showimg(image, mode)
 
