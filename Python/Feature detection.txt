@@ -1,0 +1,15 @@
+Based on documentation: http://opencv.willowgarage.com/documentation/cpp/feature_detection.html
+
+SURF(hessianThreshold, nOctaves, nOctaveLayers, extended)
+	-Currently adjusting the hessianThreshold with the trackbar.
+	-What should the trackbar range be?
+SIFT(nOctaves, nOctaveLaters, firstOctave, angleMode)
+	*other parameters exist as well (e.g. threshold, edgeThreshold, and descriptor parameters)
+	-Which should I adjust with the trackbar?
+	-What should be the range of the trackbar? 
+MSER(delta, min_area, max_area, max_variation, min_diversity, max_evolution, area_threshold, min_margin, edge_blur_size)
+	-What parameter should be adjusted with trackbar size?
+	-Range of trackbar?
+StarDetector(maxSize, responseThreshold, lineThresholdProjected, lineThresholdBinarized, suppressNonmaxSize)
+	-Parameter to be adjusted?
+	-Trackbar range?

@@ -4,8 +4,9 @@ import sys, os
 import cv2 as cv
 import numpy as np
 
-# WaitKey == 27 not working properly
+# WaitKey not working properly
 # What values for threshold in various algorithms
+# Waitkeytime?
 
 def main():
     dir = os.getcwd()
@@ -21,18 +22,18 @@ def main():
     endPos = 10000 #===
     createGUI(windowName, trackbarName, curPos, endPos)
     
-    while cv.waitKey(15) != 27:
-        if cv.waitKey(15) == 110: #n for next image
+    while cv.waitKey(5) != 27:
+        if cv.waitKey(5) == 110: #n for next image
             print('next image')
             image = getImg(dir, imgNo)
-        if cv.waitKey(15) == 112: #p previous image
+        if cv.waitKey(5) == 112: #p previous image
             print('prev image')
-        if cv.waitKey(15) == 62: #right arrow
+        if cv.waitKey(5) == 62: #right arrow
             print('right arrow')
             mode += 1
             #if mode > _:
                 #mode = 0
-        if cv.waitKey(15) == 60:#left arrow
+        if cv.waitKey(5) == 60:#left arrow
             print('left arrow')
             mode -= 1
             #if mode < _:
@@ -66,11 +67,10 @@ def getalg(curPos, mode):
     if mode == 0:
         return cv.SURF(curPos, nOctaves=4, nOctaveLayers=2, extended=True, upright=False)
     elif mode == 1:
-        return cv.SIFT()
+        return cv.SIFT(curPos)
     elif mode == 2:
-        return cv.MSER()
+        return cv.MSER(curPos)
     elif mode == 3:
-        return cv.StarDetector()
+        return cv.StarDetector(curPos)
     
 main()
-        
