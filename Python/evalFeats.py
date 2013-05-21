@@ -7,35 +7,50 @@ import numpy as np
 # WaitKey == 27 not working properly
 # What values for threshold in various algorithms
 
-img = str(sys.argv[1]) #== to be updated later
-mode = int(sys.argv[2])
-image = cv.imread(img)
-windowName = 'evalFeats.py'
-trackbarName = 'Adjust'
-curPos = 0 # Location of trackbar slider
-endPos = 10000 #===
-
-def main(image):
-    #image = getImg()
+def main():
+    dir = os.getcwd()
+    print('Current directory: '+str(dir))
+    mode = int(sys.argv[2])
+    imgNo = 2
+    image = getImg(dir, imgNo)
+    
+    windowName = 'evalFeats.py'
+    trackbarName = 'Adjust'
+    
+    curPos = 0 # Location of trackbar slider
+    endPos = 10000 #===
     createGUI(windowName, trackbarName, curPos, endPos)
-    #c = cv.waitKey() #need num?
-    #while c != 27:
-        #if c == 113: #n for next image
-            #image = getImg()
-        #if c == #p previous image
-        #if c == #right arrow? Next alg
-            #mode += 1
-        #if c == #left arrow? Next alg
-            #mode -= 1
-        #showimg(image, mode)
-    while cv.waitKey(15) != 27: #ESC
-        showimg(image, mode)
-
+    
+    while cv.waitKey(15) != 27:
+        if cv.waitKey(15) == 110: #n for next image
+            print('next image')
+            image = getImg(dir, imgNo)
+        if cv.waitKey(15) == 112: #p previous image
+            print('prev image')
+        if cv.waitKey(15) == 62: #right arrow
+            print('right arrow')
+            mode += 1
+            #if mode > _:
+                #mode = 0
+        if cv.waitKey(15) == 60:#left arrow
+            print('left arrow')
+            mode -= 1
+            #if mode < _:
+                #mode = _
+        showimg(image, mode, trackbarName, windowName)
+#     while cv.waitKey(15) != 27: #ESC
+#         showimg(image, mode)
+def getImg(dir, n):
+    imagelist = [f for f in os.listdir(dir)]
+    
+    image = cv.imread(imagelist[n])
+    return image
+    
 def createGUI(windowName, trackbarName, curPos, endPos):
     cv.namedWindow(windowName, cv.CV_WINDOW_AUTOSIZE)
     cv.createTrackbar(trackbarName, windowName, curPos, endPos, barPos) # barPos(x) called when slider moved
 
-def showimg(image, mode):
+def showimg(image, mode, trackbarName, windowName):
     curPos = cv.getTrackbarPos(trackbarName, windowName)
     imCopy = image.copy() # Create copy of image to draw pts on
     
@@ -57,4 +72,5 @@ def getalg(curPos, mode):
     elif mode == 3:
         return cv.StarDetector()
     
-main(image)    
+main()
+        
