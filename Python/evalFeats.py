@@ -3,16 +3,27 @@
 import sys, os
 import cv2 as cv
 import numpy as np
+import imghdr
 
-# WaitKey not working properly
+# WaitKey works with qt, requires holding down sometimes
 # What values for threshold in various algorithms
-# Waitkeytime?
-
+# Qt button options (not in python?): http://docs.opencv.org/modules/highgui/doc/qt_new_functions.html#
+# Multiple trackbars?
+'''Brainsurf feature evaluator.
+In commandline, call from folder containing the images:
+    python <path_to>evalFeats.py <mode>
+    
+Modes:
+    0 - SURF
+    1 - SIFT
+    2 - MSER
+    3 - StarDetector
+'''
 def main():
     dir = os.getcwd()
     print('Current directory: '+str(dir))
-    mode = int(sys.argv[2])
-    imgNo = 2
+    mode = int(sys.argv[1])
+    imgNo = 0
     image = getImg(dir, imgNo)
     
     windowName = 'evalFeats.py'
@@ -21,33 +32,41 @@ def main():
     curPos = 0 # Location of trackbar slider
     endPos = 10000 #===
     createGUI(windowName, trackbarName, curPos, endPos)
-    
-    while cv.waitKey(5) != 27:
-        if cv.waitKey(5) == 110: #n for next image
-            print('next image')
+
+    while cv.waitKey(5) != 113: # 'q' for quit
+        if cv.waitKey(5) == 110: # 'n' for next image
+            print('NEXT IMAGE')
+            imgNo += 1
             image = getImg(dir, imgNo)
-        if cv.waitKey(5) == 112: #p previous image
-            print('prev image')
-        if cv.waitKey(5) == 62: #right arrow
-            print('right arrow')
+        if cv.waitKey(5) == 112: # 'p' previous image
+            print('PREVIOUS IMAGE')
+            imgNo -= 1
+            image = getImg(dir, imgNo)
+        if cv.waitKey(5) == 62: # '>' for mode + 1
+            print('MODE + 1')
             mode += 1
-            #if mode > _:
-                #mode = 0
-        if cv.waitKey(5) == 60:#left arrow
-            print('left arrow')
+            if mode > 3:
+                mode = 0
+        if cv.waitKey(5) == 60: # '<' for mode - 1
+            print('MODE - 1')
             mode -= 1
-            #if mode < _:
-                #mode = _
+            if mode < 0:
+                mode = 3
         showimg(image, mode, trackbarName, windowName)
-#     while cv.waitKey(15) != 27: #ESC
-#         showimg(image, mode)
+    print ('QUIT')
+
 def getImg(dir, n):
-    imagelist = [f for f in os.listdir(dir)]
-    
+    imagelist = [f for f in os.listdir(dir) if imghdr.what(f) != None] #imghdr returns None if not an img type
+    if n >= len(imagelist):
+        n = 0
+    elif n < 0:
+        n = len(imagelist)-1
     image = cv.imread(imagelist[n])
+    print('Current image: '+str(imagelist[n]))
     return image
     
 def createGUI(windowName, trackbarName, curPos, endPos):
+    # Different GUI for each feature detector?
     cv.namedWindow(windowName, cv.CV_WINDOW_AUTOSIZE)
     cv.createTrackbar(trackbarName, windowName, curPos, endPos, barPos) # barPos(x) called when slider moved
 
