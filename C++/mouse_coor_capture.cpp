@@ -164,7 +164,7 @@ int main(int argc, char** argv)
 			//printf("%s","\n");
 			if(isit)
 			{
-				cvCircle(myresize,cvPoint(((posx*myresize->width)/saveit),(posy*myresize->height)/saveity),2,CV_RGB(0,255,255),-1);
+				cvCircle(myresize,cvPoint(((posx*myresize->width)/saveit),(posy*myresize->height)/saveity),2,CV_RGB(255,0,0),-1);
 				cvShowImage("Mouse Coordinate Calc", myresize);
 
 			}
