@@ -1,8 +1,8 @@
 //#include "stdafx.h"
 #include <iostream>
 #include <fstream>
-#include "wtypes.h"
-#include "opencv\cv.h"
+// #include "wtypes.h"
+#include "opencv/cv.h"
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/core/core_c.h"
 #include "opencv2/core/core.hpp"
@@ -21,7 +21,7 @@ int posx;
 int posy;
 int saveit;
 int saveity;
-boolean isit;
+bool isit;
 IplImage *myresize;
 
 void mouseEvent(int evt, int x, int y, int flags, void* param){
