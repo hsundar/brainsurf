@@ -32,22 +32,24 @@ def main():
     curPos = 0 # Location of trackbar slider
     endPos = 10000 #===
     createGUI(windowName, trackbarName, curPos, endPos)
-
-    while cv.waitKey(5) != 113: # 'q' for quit
-        if cv.waitKey(5) == 110: # 'n' for next image
+    
+    c = 0
+    while c != 113: # 'q' for quit
+        c = cv.waitKey(1)
+        if c == 110: # 'n' for next image
             print('NEXT IMAGE')
             imgNo += 1
             image = getImg(dir, imgNo)
-        if cv.waitKey(5) == 112: # 'p' previous image
+        elif c == 112: # 'p' previous image
             print('PREVIOUS IMAGE')
             imgNo -= 1
             image = getImg(dir, imgNo)
-        if cv.waitKey(5) == 62: # '>' for mode + 1
+        elif c == 62: # '>' for mode + 1
             print('MODE + 1')
             mode += 1
             if mode > 3:
                 mode = 0
-        if cv.waitKey(5) == 60: # '<' for mode - 1
+        elif c == 60: # '<' for mode - 1
             print('MODE - 1')
             mode -= 1
             if mode < 0:
