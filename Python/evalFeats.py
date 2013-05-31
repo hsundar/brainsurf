@@ -5,7 +5,7 @@ import cv2 as cv
 import numpy as np
 import imghdr
 
-# WaitKey works with qt, requires holding down sometimes
+# Algorithms dont return values in same format
 # What values for threshold in various algorithms
 # Qt button options (not in python?): http://docs.opencv.org/modules/highgui/doc/qt_new_functions.html#
 # Multiple trackbars?
@@ -22,6 +22,7 @@ Modes:
 def main():
     dir = os.getcwd()
     print('Current directory: '+str(dir))
+    print('Press "q" to quit\n"n" for next image\n"p" for previous image\n"." for next algorithm\n"," for previous algorithm')
     mode = int(sys.argv[1])
     imgNo = 0
     image = getImg(dir, imgNo)
@@ -44,12 +45,12 @@ def main():
             print('PREVIOUS IMAGE')
             imgNo -= 1
             image = getImg(dir, imgNo)
-        elif c == 62: # '>' for mode + 1
+        elif c == 46: # '.' for mode + 1
             print('MODE + 1')
             mode += 1
             if mode > 3:
                 mode = 0
-        elif c == 60: # '<' for mode - 1
+        elif c == 44: # ',' for mode - 1
             print('MODE - 1')
             mode -= 1
             if mode < 0:
@@ -58,7 +59,7 @@ def main():
     print ('QUIT')
 
 def getImg(dir, n):
-    imagelist = [f for f in os.listdir(dir) if imghdr.what(f) != None] #imghdr returns None if not an img type
+    imagelist = [f for f in os.listdir(dir) if imghdr.what(f) != None] #imghdr returns None if not an image
     if n >= len(imagelist):
         n = 0
     elif n < 0:
@@ -75,23 +76,29 @@ def createGUI(windowName, trackbarName, curPos, endPos):
 def showimg(image, mode, trackbarName, windowName):
     curPos = cv.getTrackbarPos(trackbarName, windowName)
     imCopy = image.copy() # Create copy of image to draw pts on
-    
+
     alg = getalg(curPos, mode)
-    pts = alg.detect(imCopy)
-    cv.drawKeypoints(imCopy, pts, imCopy, (0,255,0))
+    
+    # Different cases for different algs
+    if mode in [0,1]:
+        pts = alg.detect(imCopy)
+        cv.drawKeypoints(imCopy, pts, imCopy, (0,255,0))
+    elif mode in [2]:
+        pts = alg.detect(imCopy)
+        print(pts)
     cv.imshow(windowName, imCopy)
       
 def barPos(x): # Updates curPos when trackbar slider moves
     curPos = x
-    
+
 def getalg(curPos, mode):
     if mode == 0:
         return cv.SURF(curPos, nOctaves=4, nOctaveLayers=2, extended=True, upright=False)
     elif mode == 1:
         return cv.SIFT(curPos)
-    elif mode == 2:
-        return cv.MSER(curPos)
-    elif mode == 3:
+    elif mode == 2: #=== does not return keypts like other algs (features2d.hpp; convert function)
+        return cv.MSER(curPos) # vector<vector<pt>>
+    elif mode == 3: #=== does not return keypts like other algs...
         return cv.StarDetector(curPos)
     
 main()
