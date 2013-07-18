@@ -2,6 +2,7 @@
 //#include "stdafx.h"
 #include <iostream>
 #include <stdio.h>
+#include <vector>
 #include <fstream>
 #include <QDebug>
 #include <QMessageBox>
@@ -87,15 +88,121 @@ void mouseEvent(int evt, int x, int y, int flags, void* param){
         cvShowImage("Mouse Coordinate Calc", img);
         }
         myFile.close();
+        
     }
+
     if(evt==CV_EVENT_RBUTTONDOWN)
     {
-        bool present=false;  //boolean to indicate if the point is in the file stream
+        ifstream mousefile;
+        mousefile.open(filepointer);
+        bool isitnear = false;  //boolean to check if the mouse pointer is near a keypoint
+        int xholder;
+        int yholder;
+        int nearx=0;
+        int neary=0;
+        string mousestring;
+        while(!mousefile.eof())
+       {
+           getline(mousefile,mousestring,' ');
+           xholder=atoi(mousestring.c_str());
+           mousestring="";
+           getline(mousefile,mousestring,'\n');
+           yholder=atoi(mousestring.c_str());
+           if(((x>xholder-3)&&(x<xholder+3))&&((y>yholder-3)&&(y<yholder+3)))
+           {
+               isitnear=true;
+               nearx=xholder;
+               neary=yholder;
+               QMessageBox askBox;
+               askBox.setWindowTitle("Point deletion confirmation");
+               askBox.setText("Are you sure you want to delete these points?");
+               askBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
+               askBox.setDefaultButton(QMessageBox::Ok);
+               QString xcoor=QString::number(xholder);
+               QString ycoor=QString::number(yholder);
+               xcoor.append(" ");
+               xcoor.append(ycoor);
+               askBox.setInformativeText(xcoor);
+               int choice=askBox.exec();
+               string holderstring;
+               holderstring=xcoor.toStdString();
+               holderstring.append("\n");
+               mousefile.close();
+               if(choice==QMessageBox::Ok)
+               {
+                   ifstream readsize;
+                   readsize.open(filepointer);
+                   if(!readsize){
+                       qDebug()<<"ERROR";
+                   }
+                   qDebug()<<"Part 0";
+                   int size=0;
+                   string holderstr;
+                   for(int i=0;readsize>>holderstr;i++)
+                   {
+                        size++;
+                        qDebug()<<i;
+
+                   }
+                  readsize.close();
+
+                  vector<string> pointarray;
+                  
+                  ifstream readfile;
+                  readfile.open(filepointer);
+                  
+                  string mainholder;
+                  for(int i=0;i<size;i++)
+                  {
+                      getline(readfile,mainholder,'\n');
+
+                      mainholder.append("\n");
+                      if(mainholder.compare(holderstring)==0)
+                      {
+                          mainholder="";
+                      }
+                      qDebug()<<"Part this one";
+                      pointarray.push_back(mainholder);
+                  }
+                  readfile.close();
+                  if(remove(filepointer) !=0)
+                  {
+                          qDebug()<<"error with deletion.";
+                  }
+
+                  ofstream writefile;
+                  writefile.open(filepointer,std::ios_base::app);
+                  for(int i=0;i<pointarray.size();i++)
+                  {
+                      writefile<<pointarray[i];
+                  }
+                  writefile.close();
+                   QMessageBox confirmBox;
+                   confirmBox.setWindowTitle("Point deleted.");
+                   confirmBox.setText("The point has been deleted.");
+                   confirmBox.setStandardButtons(QMessageBox::Ok);
+                   confirmBox.setDefaultButton(QMessageBox::Ok);
+                   confirmBox.exec();
+               }
+           }
+           else
+           {
 
 
+           }
+
+       }
+        if(isitnear)
+        {
+            qDebug()<<"Mouse Event!"<<nearx<<neary;
+        }
+        else
+        {
+            qDebug()<<"No Mouse Event!";
+        }
 
     }
-}
+ }
 
 int* GetDesk()  //function to get the properties of the screen
 {
