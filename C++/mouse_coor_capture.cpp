@@ -226,7 +226,7 @@ int* GetDesk()  //function to get the properties of the screen
 }
 
 
-int OpenCVMain(const char* direcimg, const char* directxt, int minHessian, QFileInfoList filelist,int curIndex)
+int OpenCVMain(const char* direcimg, const char* directxt, const char* featpath, int minHessian, QFileInfoList filelist,int curIndex)
 {
         filepointer=directxt;
         isit=false;  //assume that the image is not resized, initially.
@@ -284,123 +284,12 @@ int OpenCVMain(const char* direcimg, const char* directxt, int minHessian, QFile
             printf("%s",direcimg);
             newfile=true;
             QMessageBox msgBox;
-            msgBox.setText("Appropriate text file not found. Generating points automatically.");
+            msgBox.setText("Appropriate text file not found. Press 'g' to generate points automatically.");
             msgBox.setStandardButtons(QMessageBox::Ok);
             msgBox.setDefaultButton(QMessageBox::Ok);
 
             msgBox.exec();
-            Mat img_1;
-            if(isit){
-                img_1=myresize;
-            }
-            else{
-                img_1 = imread( direcimg, CV_LOAD_IMAGE_GRAYSCALE );
-            }
-            if( !img_1.data)
-            { std::cout<< " --(!) Error reading images " << std::endl; return -1; }            ;
 
-            SiftFeatureDetector detector( minHessian );
-
-            std::vector<KeyPoint> keypoints_1;
-
-            detector.detect( img_1, keypoints_1 );
-
-            //-- Draw keypoints
-            Mat img1_keys;
-
-            drawKeypoints( img_1, keypoints_1, img1_keys, Scalar::all(-1), DrawMatchesFlags::DEFAULT );
-
-            if(isit){
-                IplImage* image2=cvCloneImage(&(IplImage)img1_keys);
-                myresize=image2;
-                cvShowImage("Mouse Coordinate Calc", myresize);
-                std::ofstream tempfile;
-                tempfile.open(directxt,std::ios_base::app);
-                for(std::vector<KeyPoint>::iterator it = keypoints_1.begin(); it != keypoints_1.end(); ++it) {
-                    stringstream string1 (stringstream::in | stringstream::out);
-                    float tempholder=0.00;
-                    float finalholder=0.00;
-                    tempholder=keypoints_1.at(it - keypoints_1.begin()).pt.x;
-                    finalholder=(saveit*tempholder)/(myresize->width);
-                    string1<<finalholder;
-                    string1<<" ";
-                    tempholder=keypoints_1.at(it - keypoints_1.begin()).pt.y;
-                    finalholder=(saveity*tempholder)/(myresize->height);
-                    string1<<finalholder;
-                    string1<<"\n";
-                    string offload=string1.str();
-                    tempfile<<offload;
-                }
-                tempfile.close();
-                qDebug()<<"Worked.";
-            }
-            else{
-                IplImage* image2=cvCloneImage(&(IplImage)img1_keys);
-                img=image2;
-                cvShowImage("Mouse Coordinate Calc", img);
-                std::ofstream tempfile;
-                tempfile.open(directxt,std::ios_base::app);
-                qDebug()<<"This worked.";
-                for(std::vector<KeyPoint>::iterator it = keypoints_1.begin(); it != keypoints_1.end(); ++it) {
-                    stringstream string1 (stringstream::in | stringstream::out);
-                    string1<<keypoints_1.at(it - keypoints_1.begin()).pt.x;
-                    string1<<" ";
-                    string1<<keypoints_1.at(it - keypoints_1.begin()).pt.y;
-                    string1<<"\n";
-                    string offload=string1.str();
-                    tempfile<<offload;
-                }
-                tempfile.close();
-                qDebug()<<"Worked";
-            }
-
-
-
-            cvSetMouseCallback("Mouse Coordinate Calc", mouseEvent, 0);
-            int keypressed=waitKey(0);
-
-            if(keypressed=='d'){
-                curIndex+=1;
-                curIndex=curIndex%filelist.size();
-                QString QImagePath=filelist[curIndex].absoluteFilePath();
-                QByteArray holder = QImagePath.toLocal8Bit();
-                const char* ImagePath = holder.data();
-
-                QString QTxtPath=QImagePath;
-                QTxtPath.append(".txt");
-                QByteArray holder2 = QTxtPath.toLocal8Bit();
-                const char* TxtPath = holder2.data();
-
-                OpenCVMain(ImagePath,TxtPath,minHessian,filelist,curIndex);
-
-            }
-            if(keypressed=='a')
-            {
-                curIndex-=1;
-                if(curIndex<0)
-                {
-                    curIndex=filelist.size()-1;
-                }
-                QString QImagePath=filelist[curIndex].absoluteFilePath();
-                QByteArray holder = QImagePath.toLocal8Bit();
-                const char* ImagePath = holder.data();
-
-                QString QTxtPath=QImagePath;
-                QTxtPath.append(".txt");
-                QByteArray holder2 = QTxtPath.toLocal8Bit();
-                const char* TxtPath = holder2.data();
-
-                OpenCVMain(ImagePath,TxtPath,minHessian,filelist,curIndex);
-            }
-            if(keypressed==27)
-            {
-                cvDestroyWindow("Mouse Coordinate Calc");
-                cvReleaseImage(&img);
-                return 0;
-            }
-            cvDestroyWindow("Mouse Coordinate Calc");
-            cvReleaseImage(&img);
-            return 0;
         }
         else  //if the textfile does exist, draw the points contained in the textfile onto the screen
         {
@@ -449,7 +338,7 @@ int OpenCVMain(const char* direcimg, const char* directxt, int minHessian, QFile
             QByteArray holder2 = QTxtPath.toLocal8Bit();
             const char* TxtPath = holder2.data();
 
-            OpenCVMain(ImagePath,TxtPath,minHessian,filelist,curIndex);
+            OpenCVMain(ImagePath,TxtPath,featpath,minHessian,filelist,curIndex);
 
         }
         if(keypressed=='a')
@@ -468,7 +357,7 @@ int OpenCVMain(const char* direcimg, const char* directxt, int minHessian, QFile
             QByteArray holder2 = QTxtPath.toLocal8Bit();
             const char* TxtPath = holder2.data();
 
-            OpenCVMain(ImagePath,TxtPath,minHessian,filelist,curIndex);
+            OpenCVMain(ImagePath,TxtPath,featpath,minHessian,filelist,curIndex);
         }
         if(keypressed==27)
         {
@@ -549,7 +438,9 @@ int OpenCVMain(const char* direcimg, const char* directxt, int minHessian, QFile
                 tempfile.close();
                 qDebug()<<"Worked";
             }
-            OpenCVMain(direcimg,directxt,minHessian,filelist,curIndex);
+
+            OpenCVMain(direcimg,directxt,featpath,minHessian,filelist,curIndex);
+
 
         }
 
@@ -607,3 +498,118 @@ else
         generated=true;*//*
 }
 */
+
+/* Extracted from not finding the textfile part:
+ *Mat img_1;
+            if(isit){
+                img_1=myresize;
+            }
+            else{
+                img_1 = imread( direcimg, CV_LOAD_IMAGE_GRAYSCALE );
+            }
+            if( !img_1.data)
+            { std::cout<< " --(!) Error reading images " << std::endl; return -1; }            ;
+
+            SiftFeatureDetector detector( minHessian );
+
+            std::vector<KeyPoint> keypoints_1;
+
+            detector.detect( img_1, keypoints_1 );
+
+            //-- Draw keypoints
+            Mat img1_keys;
+
+            drawKeypoints( img_1, keypoints_1, img1_keys, Scalar::all(-1), DrawMatchesFlags::DEFAULT );
+
+            if(isit){
+                IplImage* image2=cvCloneImage(&(IplImage)img1_keys);
+                myresize=image2;
+                cvShowImage("Mouse Coordinate Calc", myresize);
+                std::ofstream tempfile;
+                tempfile.open(directxt,std::ios_base::app);
+                for(std::vector<KeyPoint>::iterator it = keypoints_1.begin(); it != keypoints_1.end(); ++it) {
+                    stringstream string1 (stringstream::in | stringstream::out);
+                    float tempholder=0.00;
+                    float finalholder=0.00;
+                    tempholder=keypoints_1.at(it - keypoints_1.begin()).pt.x;
+                    finalholder=(saveit*tempholder)/(myresize->width);
+                    string1<<finalholder;
+                    string1<<" ";
+                    tempholder=keypoints_1.at(it - keypoints_1.begin()).pt.y;
+                    finalholder=(saveity*tempholder)/(myresize->height);
+                    string1<<finalholder;
+                    string1<<"\n";
+                    string offload=string1.str();
+                    tempfile<<offload;
+                }
+                tempfile.close();
+                qDebug()<<"Worked.";
+            }
+            else{
+                IplImage* image2=cvCloneImage(&(IplImage)img1_keys);
+                img=image2;
+                cvShowImage("Mouse Coordinate Calc", img);
+                std::ofstream tempfile;
+                tempfile.open(directxt,std::ios_base::app);
+                qDebug()<<"This worked.";
+                for(std::vector<KeyPoint>::iterator it = keypoints_1.begin(); it != keypoints_1.end(); ++it) {
+                    stringstream string1 (stringstream::in | stringstream::out);
+                    string1<<keypoints_1.at(it - keypoints_1.begin()).pt.x;
+                    string1<<" ";
+                    string1<<keypoints_1.at(it - keypoints_1.begin()).pt.y;
+                    string1<<"\n";
+                    string offload=string1.str();
+                    tempfile<<offload;
+                }
+                tempfile.close();
+                qDebug()<<"Worked";
+            }
+*/
+/* taken from below this:
+ cvSetMouseCallback("Mouse Coordinate Calc", mouseEvent, 0);
+            int keypressed=waitKey(0);
+
+            if(keypressed=='d'){
+                curIndex+=1;
+                curIndex=curIndex%filelist.size();
+                QString QImagePath=filelist[curIndex].absoluteFilePath();
+                QByteArray holder = QImagePath.toLocal8Bit();
+                const char* ImagePath = holder.data();
+
+                QString QTxtPath=QImagePath;
+                QTxtPath.append(".txt");
+                QByteArray holder2 = QTxtPath.toLocal8Bit();
+                const char* TxtPath = holder2.data();
+
+                OpenCVMain(ImagePath,TxtPath,featpath, minHessian,filelist,curIndex);
+
+            }
+            if(keypressed=='a')
+            {
+                curIndex-=1;
+                if(curIndex<0)
+                {
+                    curIndex=filelist.size()-1;
+                }
+                QString QImagePath=filelist[curIndex].absoluteFilePath();
+                QByteArray holder = QImagePath.toLocal8Bit();
+                const char* ImagePath = holder.data();
+
+                QString QTxtPath=QImagePath;
+                QTxtPath.append(".txt");
+                QByteArray holder2 = QTxtPath.toLocal8Bit();
+                const char* TxtPath = holder2.data();
+
+                OpenCVMain(ImagePath,TxtPath,featpath, minHessian,filelist,curIndex);
+            }
+            if(keypressed==27)
+            {
+                cvDestroyWindow("Mouse Coordinate Calc");
+                cvReleaseImage(&img);
+                return 0;
+            }
+            cvDestroyWindow("Mouse Coordinate Calc");
+            cvReleaseImage(&img);
+            return 0;
+        }
+        */
