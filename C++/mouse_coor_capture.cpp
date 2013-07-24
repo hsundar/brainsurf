@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <vector>
 #include <fstream>
-#include <QDebug>
+#include <QtDebug>
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QKeyEvent>
@@ -63,7 +63,7 @@ void mouseEvent(int evt, int x, int y, int flags, void* param){
             ss<<virx;   //write the actual x coordinate into the stringstream
         }
         else{
-        ss << x;
+            ss << x;
         }
         string strx = ss.str();
         string myStr="";
@@ -74,7 +74,7 @@ void mouseEvent(int evt, int x, int y, int flags, void* param){
             ssy<<viry;
         }
         else{
-        ssy<<y;
+            ssy<<y;
         }
         string stry = ssy.str();
         myStr+=" ";
@@ -106,6 +106,9 @@ void mouseEvent(int evt, int x, int y, int flags, void* param){
         float nearx=0;
         float neary=0;
         string mousestring;
+        virx=(saveit*x)/(myresize->width);   //the actual x coordinate of the actual image is the proportion of the original image's width times its x
+                                             //coordinate, divided by the original width.
+        viry=(saveity*y)/(myresize->height);
         while(!mousefile.eof())
        {
            getline(mousefile,mousestring,' ');
@@ -113,7 +116,7 @@ void mouseEvent(int evt, int x, int y, int flags, void* param){
            mousestring="";
            getline(mousefile,mousestring,'\n');
            yholder=atof(mousestring.c_str());
-           if(((x>xholder-3)&&(x<xholder+3))&&((y>yholder-3)&&(y<yholder+3)))
+           if((((x>xholder-3)&&(x<xholder+3))&&((y>yholder-3)&&(y<yholder+3)))&&(!isit))
            {
                isitnear=true;
                nearx=xholder;
@@ -132,7 +135,91 @@ void mouseEvent(int evt, int x, int y, int flags, void* param){
                int choice=askBox.exec();
                string holderstring;
                holderstring=xcoor.toStdString();
-               holderstring.append("\n");
+               //holderstring.append("\n");
+               if(labelmode)
+               {
+                   ignorepoints.push_back(xcoor.toStdString());
+               }
+               mousefile.close();
+               if(choice==QMessageBox::Ok)
+               {
+                   ifstream readsize;
+                   readsize.open(filepointer);
+                   if(!readsize){
+                       qDebug()<<"ERROR";
+                   }
+                   qDebug()<<"Part 0";
+                   int size=0;
+                   string holderstr;
+                   for(int i=0;readsize>>holderstr;i++)
+                   {
+                        size++;
+                        qDebug()<<i;
+
+                   }
+                  readsize.close();
+
+                  vector<string> pointarray;
+
+                  ifstream readfile;
+                  readfile.open(filepointer);
+
+                  string mainholder;
+                  for(int i=0;i<size;i++)
+                  {
+                      getline(readfile,mainholder,'\n');
+
+                      mainholder.append("\n");
+                      qDebug()<<QString(mainholder.c_str())<<QString(holderstring.c_str());
+                      qDebug()<<"end";
+                      if(mainholder.compare(holderstring)==0)
+                      {
+                          mainholder="";
+                      }
+                      pointarray.push_back(mainholder);
+                  }
+                  readfile.close();
+                  if(remove(filepointer) !=0)
+                  {
+                          qDebug()<<"error with deletion.";
+                  }
+
+                  ofstream writefile;
+                  writefile.open(filepointer,std::ios_base::app);
+                  for(int i=0;i<pointarray.size();i++)
+                  {
+                      writefile<<pointarray[i];
+                  }
+                  writefile.close();
+                   QMessageBox confirmBox;
+                   confirmBox.setWindowTitle("Point deleted.");
+                   confirmBox.setText("The point has been deleted.");
+                   confirmBox.setStandardButtons(QMessageBox::Ok);
+                   confirmBox.setDefaultButton(QMessageBox::Ok);
+                   confirmBox.exec();
+               }
+           }
+           else if((((virx>xholder-30)&&(virx<xholder+30))&&((viry>yholder-30)&&(viry<yholder+30)))&&(isit))
+           {
+               qDebug()<<"Launched";
+               isitnear=true;
+               nearx=xholder;
+               neary=yholder;
+               QMessageBox askBox;
+               askBox.setWindowTitle("Point deletion confirmation");
+               askBox.setText("Are you sure you want to delete these points?");
+               askBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
+               askBox.setDefaultButton(QMessageBox::Ok);
+               QString xcoor=QString::number(xholder);
+               QString ycoor=QString::number(yholder);
+               xcoor.append(" ");
+               xcoor.append(ycoor);
+               xcoor.append("\n");
+               askBox.setInformativeText(xcoor);
+               int choice=askBox.exec();
+               string holderstring;
+               holderstring=xcoor.toStdString();
+
                if(labelmode)
                {
                    ignorepoints.push_back(xcoor.toStdString());
@@ -194,10 +281,6 @@ void mouseEvent(int evt, int x, int y, int flags, void* param){
                    confirmBox.setDefaultButton(QMessageBox::Ok);
                    confirmBox.exec();
                }
-           }
-           else
-           {
-
 
            }
 
@@ -331,7 +414,7 @@ int OpenCVMain(const char* direcimg, const char* directxt, const char* featpath,
             cvSetMouseCallback("Mouse Coordinate Calc", mouseEvent, 0);
 
         }
-
+        cvSetMouseCallback("Mouse Coordinate Calc", mouseEvent, 0);
         int keypressed=cvWaitKey(0);
         qDebug()<<keypressed;
         if(keypressed=='d'){
